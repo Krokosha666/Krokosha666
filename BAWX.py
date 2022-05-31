@@ -1,57 +1,45 @@
+#tested on windows
 import os,math,time,click
-from threading import Thread
 clr=lambda:click.clear()
-fill = '  '
-
-msx = 60#116
-msy = 60
-
+#view port size
+msx = 25#60#110
+msy = 25#60
+#rotating speed
 mvSp = 0.1
-
-points = [[4,4],[23,7],[7,24],[10,10]]
-
+#memory
 ang = 0
 s=''
-
-def cBack(r, g, b, text):
-    return f'\033[48;2;{r};{g};{b}m{text}\033[0m'
-
+###script###
+points = [[4,4],[3,7],[7,4],[1,1]]
+#helper functions
+def cBack(r, g, b, txt):
+    return f'\033[48;2;{r};{g};{b}m{txt}\033[0m'
 def dist(ax,ay,bx,by):
  dx = ax-bx
  dy = ay-by
  return math.sqrt(dx*dx + dy*dy)
-
+#render frame
 def Rend():
  global s
  s='##'*msx+'##\n\r##'
- stab = {}
  for i in range(1,msy):
-  def doTheThing():
-   ns = ""
-   for e in range(1,msx):
-    poc = 0
-    bs = 2
-    for x,y in points:
-     prind = poc-1
-     if prind<0: prind = len(points)-1
-     xb = points[prind][0]
-     yb = points[prind][1]
-     cs = (dist(e,i,x,y) + dist(e,i,xb,yb)) / dist(x,y,xb,yb)
-     if cs<bs:
-      bs = cs
-     poc += 1
-    colsc = math.sin(pow(bs-1,0.2) *1.570796326795)
-    col = 255 - round(colsc*255)
-    ns += cBack(col,col,col,fill)
-   stab[i] = ns
-  Thread(target=doTheThing).start()
- while len(stab)+1!=msy:
-  time.sleep(0.0001)
- for i in stab.values():
-  s+=i
+  for e in range(1,msx):
+   poc = 0
+   bs = 2
+   for x,y in points:
+    prind = poc-1
+    if prind<0: prind = len(points)-1
+    xb = points[prind][0]
+    yb = points[prind][1]
+    cs = (dist(e,i,x,y) + dist(e,i,xb,yb)) / dist(x,y,xb,yb)
+    if cs<bs:
+     bs = cs
+    poc += 1
+   col = 255 - round(math.sin(pow(bs-1,0.2) *1.5708)*255)
+   s += cBack(col,col,col,"  ")
   s+="##\n\r##"
- s+="##"*msx# + "\n\r"
-
+ s+="##"*msx
+#rotation
 hpi = math.pi/2
 hmsx = msx/2
 hmsy = msy/2
@@ -69,10 +57,9 @@ def Sim():
   points[ind][0] = hmsx + math.sin(cang)*smallestSide
   points[ind][1] = hmsy + math.cos(cang)*smallestSide
   ind += 1
-
+#main loop
 while True:
- Thread(target=Sim).start()
+ Sim()
  Rend()
  clr()
  print(s)
- #time.sleep(0.016)
